@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DigiFlow</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+  .flow-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.flow-controls button{cursor:pointer}
+  .review-panel{margin-top:18px}.review-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  .review-toolbar select,.review-toolbar input{padding:9px;border-radius:8px;border:1px solid #777;background:inherit;color:inherit}
+  .review-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px;max-height:62vh;overflow:auto}
+  .product-card{padding:13px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.12)}
+  .product-card img{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:9px;cursor:zoom-in;display:block;margin-bottom:10px}
+  .product-card h3{margin:4px 0 8px}.product-meta{font-size:.85rem;line-height:1.5;opacity:.85}.product-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+  .product-actions button{cursor:pointer}.pill-status{font-size:.72rem;padding:3px 7px;border-radius:99px;border:1px solid rgba(255,255,255,.2)}
+  #lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;align-items:center;justify-content:center;padding:30px}
+  #lightbox img{max-width:92vw;max-height:92vh;border-radius:12px}.stage-log{max-height:220px;overflow:auto;font-size:.82rem;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="dot"></span>DIGIFLOW</div>
+    <div class="brand-sub">AUTOMATION CONTROL</div>
+    <nav>
+      <button class="nav active" onclick="showSection('dashboard')">&#9673; Dashboard</button>
+      <button class="nav" onclick="showSection('review')">&#10003; Review Center</button>
+      <button class="nav" onclick="showSection('pipeline')">&#9645; Pipeline</button>
+      <button class="nav" onclick="openSite('pinterest')">&#8599; Pinterest</button>
+      <button class="nav sop-nav" data-sop="digistore24">&#9881; SOP — Digistore24</button>
+      <button class="nav sop-nav" data-sop="adobe_express">&#9881; SOP — Adobe Express</button>
+      <button class="nav sop-nav" data-sop="pinterest">&#9881; SOP — Pinterest</button>
+    </nav>
+    <div class="system">
+      <div class="eyebrow">LOCAL SYSTEM</div>
+      <div><span class="status-dot"></span> Ollama local</div>
+      <div><span class="status-dot"></span> Browser ready</div>
+      <div><span class="status-dot"></span> Final Publish manual</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">DIGISTORE24 → ADOBE EXPRESS → PINTEREST</div>
+        <h1>Automation Command Center</h1>
+      </div>
+      <div class="pill"><span class="status-dot"></span> <span id="systemState">SYSTEM ONLINE</span></div>
+    </header>
+
+    <section class="stats" id="dashboardStats">
+      <div class="stat"><span>PRODUCTS</span><strong id="statProducts">0</strong><small>60 target</small></div>
+      <div class="stat"><span>VERIFIED</span><strong id="statVerified">0</strong><small>approved/processed</small></div>
+      <div class="stat"><span>IMAGES</span><strong id="statImages">0</strong><small>Adobe stage</small></div>
+      <div class="stat"><span>REVIEW</span><strong id="statReview">0</strong><small>human approval</small></div>
+    </section>
+
+    <section class="grid" id="dashboardSection">
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="eyebrow">CONNECTED WORKSPACE</div><h2>Browser Services</h2></div>
+          <button class="ghost" onclick="refreshAll()">Refresh</button>
+        </div>
+        <div class="services">
+          <article class="service"><div class="icon">D24</div><div><h3>Digistore24</h3><p>Marketplace & product research</p></div><button onclick="openSite('digistore')">OPEN / LOGIN</button></article>
+          <article class="service"><div class="icon">AE</div><div><h3>Adobe Express</h3><p>2:3 template & export workflow</p></div><button onclick="openSite('adobe')">OPEN / LOGIN</button></article>
+          <article class="service"><div class="icon">P</div><div><h3>Pinterest</h3><p>Pin preparation & final review</p></div><button onclick="openSite('pinterest')">OPEN / LOGIN</button></article>
+        </div>
+        <div id="message" class="message">Persistent DigiFlow Browser Workspace.</div>
+        <div class="flow-controls">
+          <button onclick="startCollection()">START 60-PRODUCT COLLECTION</button>
+          <button onclick="startApprovedPipeline()">RUN APPROVED → OLLAMA → ADOBE → PINTEREST</button>
+        </div>
+      </div>
+
+      <div class="panel" id="pipelineSection">
+        <div class="panel-head"><div><div class="eyebrow">TASK ENGINE</div><h2>Live Pipeline</h2></div></div>
+        <div class="pipeline">
+          <div><b>01</b><span>Find unique Digistore24 products</span><em id="stageCollection">READY</em></div>
+          <div><b>02</b><span>Verify URL / amount / details</span><em>BUILT IN</em></div>
+          <div><b>03</b><span>Human Review Center approval</span><em id="stageReview">WAITING</em></div>
+          <div><b>04</b><span>Generate local Ollama copy</span><em id="stageContent">QUEUED</em></div>
+          <div><b>05</b><span>Adobe Express image export</span><em id="stageAdobe">QUEUED</em></div>
+          <div><b>06</b><span>Prepare Pinterest Pin</span><em id="stagePinterest">QUEUED</em></div>
+          <div><b>07</b><span>Final Publish</span><em>MANUAL</em></div>
+        </div>
+        <div class="stage-log" id="stageLog"></div>
+      </div>
+    </section>
+
+    <section class="panel review-panel" id="reviewSection">
+      <div class="panel-head"><div><div class="eyebrow">HUMAN GATE</div><h2>Review Center</h2></div><button class="ghost" onclick="loadReview()">Refresh</button></div>
+      <div class="review-toolbar">
+        <select id="categoryFilter" onchange="renderReview()"><option value="All Categories">ALL CATEGORIES</option></select>
+        <select id="statusFilter" onchange="renderReview()"><option value="all">ALL STATUSES</option><option value="collected">COLLECTED</option><option value="approved">APPROVED</option><option value="content_ready">CONTENT READY</option><option value="image_ready">IMAGE READY</option><option value="pin_ready">PIN READY</option><option value="rejected">REJECTED</option></select>
+        <input id="searchFilter" placeholder="Search product..." oninput="renderReview()">
+        <button onclick="approveAllVisible()">APPROVE VISIBLE</button>
+      </div>
+      <div id="reviewSummary" class="message">Loading products...</div>
+      <div id="reviewList" class="review-list"></div>
+    </section>
+
+    <div class="bottom-bar">
+      <button class="bottom active" onclick="showSection('pipeline')">&#9889; Running Tasks <span id="runningCount">0</span></button>
+      <button class="bottom" onclick="showSection('dashboard')">&#10003; Completed Tasks <span id="completedCount">0</span></button>
+      <button class="bottom" onclick="openSite('pinterest')">&#8599; Go to Pinterest</button>
+      <button class="bottom" onclick="showSection('review')">&#9673; Review Center <span id="reviewCount">0</span></button>
+    </div>
+  </main>
+</div>
+
+<div id="lightbox" onclick="closeLightbox()"><img id="lightboxImg" alt="Product preview"></div>
+
+<script>
+let products=[]; let jobs=[]; let poller=null;
+const $=id=>document.getElementById(id);
+
+async function api(url, options={}){const r=await fetch(url,options); const d=await r.json(); if(!r.ok||d.ok===false) throw new Error(d.error||('HTTP '+r.status)); return d;}
+function msg(t){$('message').textContent=t;}
+function showSection(which){
+  $('dashboardSection').style.display=which==='dashboard'?'grid':'none';
+  $('reviewSection').style.display=which==='review'?'block':'block';
+  $('pipelineSection').style.display=which==='pipeline'||which==='dashboard'?'block':'block';
+  if(which==='review') loadReview();
+}
+async function openSite(site){try{const d=await api('/api/open/'+site,{method:'POST'});msg(site.toUpperCase()+' opened in the persistent browser. Login manually the first time.');}catch(e){msg(e.message);}}
+async function refreshAll(){await refreshStatus();await loadReview();}
+async function refreshStatus(){
+  try{
+    const d=await api('/api/status'); const s=d.storage||{}; const job=(d.jobs||[]).slice(-1)[0];
+    $('statProducts').textContent=s.products||0; $('statVerified').textContent=s.verified||0; $('statImages').textContent=s.images||0; $('statReview').textContent=s.review||0;
+    $('runningCount').textContent=s.running_tasks||0; $('completedCount').textContent=s.completed_tasks||0; $('reviewCount').textContent=s.review||0;
+    if(job){updateJobUI(job);}
+  }catch(e){msg('Status error: '+e.message);}
+}
+async function loadReview(){
+  try{
+    const d=await api('/api/review'); products=d.products||[];
+    const sel=$('categoryFilter'); const current=sel.value; sel.innerHTML='<option value="All Categories">ALL CATEGORIES</option>';
+    [...new Set(products.map(p=>p.category).filter(Boolean))].forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c.toUpperCase();sel.appendChild(o);}); sel.value=[...sel.options].some(o=>o.value===current)?current:'All Categories';
+    renderReview(); await refreshStatus();
+  }catch(e){$('reviewSummary').textContent='Review error: '+e.message;}
+}
+function renderReview(){
+  const cat=$('categoryFilter').value, st=$('statusFilter').value, q=$('searchFilter').value.toLowerCase();
+  const rows=products.filter(p=>(cat==='All Categories'||p.category===cat)&&(st==='all'||p.status===st)&&((p.name||'').toLowerCase().includes(q)));
+  $('reviewSummary').textContent=`Showing ${rows.length} of ${products.length} products. Approve products before running the downstream pipeline.`;
+  $('reviewList').innerHTML=rows.map(p=>{
+    const d=p.details||{}; const image=d.product_image_url||''; const promo=d.promotion_url||'';
+    return `<article class="product-card">
+      ${image?`<img src="${esc(image)}" alt="" onclick="openLightbox('${escAttr(image)}')">`:''}
+      <div><span class="pill-status">${esc(p.status)}</span> <span class="pill-status">${esc(p.category)}</span></div>
+      <h3>${esc(p.name)}</h3>
+      <div class="product-meta">Price: ${esc(p.amount)} ${esc(p.currency||'')}<br>Commission: ${esc(d.commission_percent??'—')}%<br>Vendor: ${esc(d.vendor||'—')}<br>Net earnings/sale: ${esc(d.net_earnings_sale??'—')}<br>Cart conversion: ${esc(d.cart_conversion_percent??'—')}%<br>Product ID: ${esc(d.external_id||'—')}</div>
+      <div class="product-actions"><button onclick="window.open('${escAttr(p.url)}','_blank')">SALES PAGE</button>${promo?`<button onclick="navigator.clipboard.writeText('${escAttr(promo)}');msg('Promo URL copied.')">COPY PROMO URL</button>`:''}${p.status==='collected'||p.status==='verified'?`<button onclick="setApproval(${p.id},true)">APPROVE</button>`:''}${p.status==='collected'||p.status==='verified'?`<button onclick="setApproval(${p.id},false)">REJECT</button>`:''}</div>
+    </article>`;
+  }).join('');
+}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function escAttr(v){return esc(v).replace(/`/g,'&#96;');}
+async function setApproval(id,yes){try{await api('/api/review/'+id+'/'+(yes?'approve':'reject'),{method:'POST'});await loadReview();msg(yes?'Product approved.':'Product rejected.');}catch(e){msg(e.message);}}
+async function approveAllVisible(){
+  const cat=$('categoryFilter').value, st=$('statusFilter').value, q=$('searchFilter').value.toLowerCase();
+  const rows=products.filter(p=>(cat==='All Categories'||p.category===cat)&&(st==='all'||p.status===st)&&((p.name||'').toLowerCase().includes(q))&&['collected','verified'].includes(p.status));
+  for(const p of rows) await setApproval(p.id,true); await loadReview();
+}
+async function startCollection(){
+  try{const d=await api('/api/pipeline/collect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target_count:60,max_pages:124})});msg('60-product collection started.');$('stageCollection').textContent='RUNNING'; startPolling();}catch(e){msg(e.message);}
+}
+async function startApprovedPipeline(){
+  try{const d=await api('/api/pipeline/approved',{method:'POST'});msg('Approved-product pipeline started.');startPolling();}catch(e){msg(e.message);}
+}
+function updateJobUI(job){
+  $('systemState').textContent=(job.status||'ONLINE').toUpperCase();
+  if(job.message) msg(job.message);
+  const stage=job.stage||'';
+  if(stage==='collection'){$('stageCollection').textContent='RUNNING';}
+  if(stage==='review'){$('stageCollection').textContent='DONE';$('stageReview').textContent='APPROVAL REQUIRED';}
+  if(stage==='content')$('stageContent').textContent='RUNNING';
+  if(stage==='images'){$('stageContent').textContent='DONE';$('stageAdobe').textContent='RUNNING';}
+  if(stage==='pinterest'){$('stageAdobe').textContent='DONE';$('stagePinterest').textContent='RUNNING';}
+  if(stage==='complete'){$('stageContent').textContent='DONE';$('stageAdobe').textContent='DONE';$('stagePinterest').textContent='READY FOR REVIEW';}
+  if(job.progress!=null) msg(`${job.message||'Pipeline'} — ${job.progress}%`);
+  const line=`[${new Date((job.updated_at||Date.now()/1000)*1000).toLocaleTimeString()}] ${job.stage||''} · ${job.status||''} · ${job.current_product||''} · ${job.last_error||''}`;
+  const log=$('stageLog'); if(!log.textContent.includes(line)) log.textContent=line+'\n'+log.textContent;
+}
+async function poll(){try{const d=await api('/api/pipeline/jobs');jobs=d.jobs||[];const job=jobs[jobs.length-1];if(job)updateJobUI(job);await refreshStatus();}catch(e){} }
+function startPolling(){if(poller)return;poller=setInterval(poll,2500);poll();}
+function openLightbox(src){$('lightboxImg').src=src;$('lightbox').style.display='flex';}
+function closeLightbox(){$('lightbox').style.display='none';$('lightboxImg').src='';}
+loadReview(); refreshStatus(); startPolling();
+</script>
+<script src="/static/app.js"></script>
+</body>
+</html>

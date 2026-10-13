@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employer Workspace Panel</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen flex">
+
+    <aside class="w-72 bg-gray-900 border-r border-gray-800 flex flex-col justify-between shrink-0">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="text-xl font-bold tracking-wider text-white">🗂️ Workspace</h1>
+                <span class="text-xs px-2 py-0.5 bg-gray-800 border border-gray-700 text-gray-400 rounded-md">{{ company_count }}/50</span>
+            </div>
+            
+            <a href="/" class="block w-full text-left px-4 py-2 rounded-lg font-medium mb-4 transition {% if not active_company_id %}bg-blue-600 text-white{% else %}bg-gray-800 text-gray-300 hover:bg-gray-700{% endif %}">
+                🖥️ Global Dashboard View
+            </a>
+
+            <div class="space-y-1">
+                <div class="flex items-center justify-between px-2 mb-2">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest">Monitored Platforms</p>
+                    <button onclick="toggleCompanyModal()" class="text-xs text-blue-400 hover:text-blue-300 font-bold px-1.5 py-0.5 bg-gray-800 border border-gray-700 rounded-md transition cursor-pointer">+ Add Company</button>
+                </div>
+                <div class="space-y-1 overflow-y-auto max-h-[50vh] pr-1">
+                    {% for company in companies %}
+                    <div class="group flex items-center justify-between p-1 rounded-lg transition {% if active_company_id == company.id %}bg-gray-800 border-l-4 border-blue-500{% else %}hover:bg-gray-800/50{% endif %}">
+                        <a href="/company/{{ company.id }}" class="flex-1 text-sm px-3 py-1.5 font-medium truncate text-gray-200">
+                            🏢 {{ company.name }}
+                        </a>
+                        <button onclick="openEditCompanyModal('{{ company.id }}', '{{ company.name }}', '{{ company.referral_link }}')" class="opacity-0 group-hover:opacity-100 text-xs text-yellow-500 hover:text-yellow-400 font-bold px-2 py-1 transition cursor-pointer">
+                            ✏️ Edit
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-gray-800 bg-gray-900/50">
+            <button onclick="toggleCalcModal()" class="w-full bg-linear-to-r from-cyan-600 to-blue-600 font-medium py-2 rounded-xl mb-2 text-sm text-white shadow-md hover:brightness-110 transition cursor-pointer">🧮 Fast Margin Matrix Simulator</button>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-8 space-y-6 overflow-y-auto max-w-7xl mx-auto">
+        <header class="flex justify-between items-center pb-4 border-b border-gray-800">
+            <div>
+                <h2 class="text-3xl font-extrabold text-white">
+                    {% if active_company_id %} Platform Focus Segment {% else %} Master Operations Deck {% endif %}
+                </h2>
+                <p class="text-sm text-gray-400 mt-1">Cross-referencing campaign deployment matrices locally.</p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleGeminiPanel()" class="bg-purple-900/40 hover:bg-purple-900/70 border border-purple-500/50 text-purple-200 px-4 py-2 rounded-xl text-sm font-medium transition flex items-center gap-2 cursor-pointer">
+                    ✨ Run Gemini AI Search Console
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Aggregated Earnings</p>
+                <p class="text-3xl font-black mt-2 text-emerald-400">${{ totals.revenue }}</p>
+            </div>
+            <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Total Deployment Debits</p>
+                <p class="text-3xl font-black mt-2 text-rose-400">${{ totals.expenses }}</p>
+            </div>
+            <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Net Profit Yield</p>
+                <p class="text-3xl font-black mt-2 {% if totals.net_profit >= 0 %}text-sky-400{% else %}text-rose-500{% endif %}">${{ totals.net_profit }}</p>
+            </div>
+        </div>
+
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+            <div class="h-64">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 w-full">
+            <h3 class="text-lg font-bold text-white mb-4">📝 Log Micro Worker Task Sequence</h3>
+            <form action="/add_task" method="POST" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium uppercase tracking-wider text-gray-400 mb-1">Target Active Channel</label>
+                        <select name="company_id" id="task_company_id" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
+                            <option value="">-- select active profile target --</option>
+                            {% for company in companies %}
+                            <option value="{{ company.id }}" {% if active_company_id == company.id or (not active_company_id and loop.first) %}selected{% endif %}>{{ company.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium uppercase tracking-wider text-gray-400 mb-1">Campaign Launch Date</label>
+                        <input type="date" name="posted_date" id="task_date" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium uppercase tracking-wider text-gray-400 mb-1">Sent Allocation (Total Clicks)</label>
+                        <input type="number" name="sent_count" id="task_sent" value="{% if last_task %}{{ last_task.sent_count }}{% endif %}" oninput="calculateInlineMargin()" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium uppercase tracking-wider text-gray-400 mb-1">Completed / Validated Node Count</label>
+                        <input type="number" name="completed_count" id="task_completed" value="{% if last_task %}{{ last_task.completed_count }}{% endif %}" oninput="calculateInlineMargin()" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium uppercase tracking-wider text-gray-400 mb-1">Income Received Per 1 Person ($)</label>
+                        <input type="number" step="0.01" name="payout_per_ref" id="task_payout" value="{% if last_task %}{{ last_task.payout_per_ref }}{% else %}2.00{% endif %}" oninput="calculateInlineMargin()" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium uppercase tracking-wider text-gray-400 mb-1">Freelancer Cost Paid Per 1 Person ($)</label>
+                        <input type="number" step="0.01" name="worker_cost" id="task_worker" value="{% if last_task %}{{ last_task.worker_cost }}{% else %}0.50{% endif %}" oninput="calculateInlineMargin()" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-medium uppercase tracking-wider text-gray-400 mb-1">Platform Processing Fee Cut Rate (%)</label>
+                        <input type="number" step="0.1" name="platform_fee" id="task_fee" value="{% if last_task %}{{ last_task.platform_fee }}{% else %}10.0{% endif %}" oninput="calculateInlineMargin()" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-sm">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-medium uppercase tracking-wider text-gray-400 mb-1">Campaign Notes & Custom Descriptions</label>
+                    <textarea name="notes" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none" placeholder="Type notes here...">{% if last_task %}{{ last_task.notes }}{% endif %}</textarea>
+                </div>
+
+                <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Live Task Calculation Yield</p>
+                        <p id="inline_status" class="text-xs text-gray-500 mt-0.5 font-medium">Fill fields to calculate yield position</p>
+                    </div>
+                    <p id="inline_profit_display" class="text-2xl font-black text-gray-500">$0.00</p>
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold py-2.5 px-4 rounded-xl transition cursor-pointer">Record Deployment Sequence</button>
+            </form>
+        </div>
+
+        <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-xs">
+            <div class="px-6 py-4 border-b border-gray-800 bg-gray-900/50">
+                <h3 class="font-bold text-lg text-white">📋 Ledger Registry Rows</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-800/40 text-gray-400 text-xs uppercase tracking-wider border-b border-gray-800">
+                        <tr>
+                            <th class="px-6 py-3.5">Deployment Date</th>
+                            <th class="px-6 py-3.5">Platform Channel</th>
+                            <th class="px-6 py-3.5 text-center">Traffic (Sent/Done)</th>
+                            <th class="px-6 py-3.5">Gross Revenue</th>
+                            <th class="px-6 py-3.5">Total Costs</th>
+                            <th class="px-6 py-3.5">Net Position</th>
+                            <th class="px-6 py-3.5">Log Notes</th>
+                            <th class="px-6 py-3.5 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-800/60">
+                        {% for task in tasks %}
+                        <tr class="hover:bg-gray-800/20 transition">
+                            <td class="px-6 py-4 text-gray-400 font-mono">{{ task.posted_at }}</td>
+                            <td class="px-6 py-4 font-bold text-white">{{ task.company_name }}</td>
+                            <td class="px-6 py-4 text-center font-mono">{{ task.sent_count }} / <span class="text-emerald-400 font-bold">{{ task.completed_count }}</span></td>
+                            <td class="px-6 py-4 text-emerald-400 font-medium">${{ task.revenue }}</td>
+                            <td class="px-6 py-4 text-rose-400">${{ task.cost }}</td>
+                            <td class="px-6 py-4 font-bold {% if task.net_profit >= 0 %}text-sky-400{% else %}text-rose-500{% endif %}">${{ task.net_profit }}</td>
+                            <td class="px-6 py-4 text-xs text-gray-400 max-w-xs truncate" title="{{ task.notes }}">{{ task.notes or '-' }}</td>
+                            <td class="px-6 py-4 text-right">
+                                <a href="/undo_task/{{ task.id }}" onclick="return confirm('Undo log row entry?')" class="bg-gray-800 border border-gray-700 text-xs text-gray-300 px-2.5 py-1.5 rounded-lg transition hover:text-rose-400">Undo Log</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div id="companyModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center hidden p-4 z-50">
+        <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl w-full max-w-md shadow-2xl relative space-y-4">
+            <button onclick="toggleCompanyModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white text-md cursor-pointer">✕</button>
+            <h3 class="text-lg font-bold text-white">🔗 Configure New Platform Channel</h3>
+            <form action="/add_company" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Company Profile Label Identity</label>
+                    <input type="text" name="name" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Referral Link Address Matrix</label>
+                    <input type="url" name="referral_link" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none" placeholder="https://...">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl text-sm transition cursor-pointer">Save New Platform Profile</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="editCompanyModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center hidden p-4 z-50">
+        <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl w-full max-w-md shadow-2xl relative space-y-4">
+            <button onclick="closeEditCompanyModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white text-md cursor-pointer">✕</button>
+            <h3 class="text-lg font-bold text-white">✏️ Rewrite Company Platform Name</h3>
+            <form id="editCompanyForm" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Company / Website Name</label>
+                    <input type="text" id="edit_company_name" name="name" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Your Tracking Referral Link</label>
+                    <input type="url" id="edit_company_link" name="referral_link" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none">
+                </div>
+                <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2.5 rounded-xl text-sm transition cursor-pointer">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="calcModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center hidden p-4 z-50">
+        <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl w-full max-w-md shadow-2xl relative space-y-4">
+            <button onclick="toggleCalcModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white text-md cursor-pointer">✕</button>
+            <h3 class="text-lg font-bold text-white">🧮 Fast Margin Matrix Simulator</h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Conversions Volume</label>
+                    <input type="number" id="sim_volume" value="10" oninput="runSimulation()" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Payout/Ref ($)</label>
+                        <input type="number" id="sim_payout" value="2.00" oninput="runSimulation()" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Worker Fee ($)</label>
+                        <input type="number" id="sim_worker" value="0.50" oninput="runSimulation()" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Platform Processing Fee Cut (%)</label>
+                    <input type="number" id="sim_fee" value="10" oninput="runSimulation()" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none">
+                </div>
+            </div>
+            <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 text-center">
+                <p id="sim_result" class="text-3xl font-black text-cyan-400">+$13.00</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="geminiPanel" class="fixed top-0 right-0 h-full w-104 bg-gray-900 border-l border-gray-800 shadow-2xl transform translate-x-full transition-transform duration-300 z-40 flex flex-col justify-between hidden">
+        <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-gray-950/20">
+            <div>
+                <h3 class="text-md font-bold text-purple-400 flex items-center gap-2">✨ Gemini AI Engine Terminal</h3>
+                <p class="text-xs text-gray-500">Live search & structured file configurations</p>
+            </div>
+            <button onclick="toggleGeminiPanel()" class="text-gray-400 hover:text-white cursor-pointer">✕</button>
+        </div>
+        <div id="aiChatContainer" class="flex-1 p-4 overflow-y-auto space-y-4 text-xs font-mono">
+            <div class="bg-gray-800/40 border border-gray-800 p-3 rounded-xl text-gray-300">
+                <span class="text-purple-400 font-bold block mb-1">🤖 GEMINI CO-PILOT:</span>
+                I am directly linked to your local ledger database. Ask me to query transaction metrics!
+            </div>
+        </div>
+        <div class="p-4 border-t border-gray-800 bg-gray-950/40 space-y-2">
+            <div class="flex gap-2">
+                <input type="text" id="aiUserQuery" onkeypress="if(event.key === 'Enter') submitQueryToGemini()" class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none" placeholder="Ask Gemini to search logs...">
+                <button onclick="submitQueryToGemini()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 rounded-xl text-xs font-bold transition cursor-pointer">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('task_date').value = new Date().toISOString().substring(0, 10);
+
+        function toggleCompanyModal() { document.getElementById('companyModal').classList.toggle('hidden'); }
+        function toggleCalcModal() { document.getElementById('calcModal').classList.toggle('hidden'); runSimulation(); }
+        function toggleGeminiPanel() { document.getElementById('geminiPanel').classList.toggle('hidden'); document.getElementById('geminiPanel').classList.toggle('translate-x-full'); }
+
+        function openEditCompanyModal(id, currentName, currentLink) {
+            document.getElementById('editCompanyForm').action = '/edit_company/' + id;
+            document.getElementById('edit_company_name').value = currentName;
+            document.getElementById('edit_company_link').value = currentLink;
+            document.getElementById('editCompanyModal').classList.remove('hidden');
+        }
+        function closeEditCompanyModal() { document.getElementById('editCompanyModal').classList.add('hidden'); }
+
+        function submitQueryToGemini() {
+            const inputField = document.getElementById('aiUserQuery');
+            const message = inputField.value.trim();
+            if(!message) return;
+            const container = document.getElementById('aiChatContainer');
+            
+            container.innerHTML += '<div class="bg-gray-800/80 p-3 rounded-xl border border-gray-700 text-gray-200 mt-2"><span class="text-blue-400 font-bold block mb-1">👤 YOU:</span>' + message + '</div>';
+            inputField.value = "";
+            container.scrollTop = container.scrollHeight;
+            const loadingId = "load_" + Date.now();
+            container.innerHTML += '<div id="' + loadingId + '" class="bg-purple-950/20 p-3 rounded-xl border border-purple-900/30 text-purple-300 animate-pulse mt-2">Connecting to model context...</div>';
+            container.scrollTop = container.scrollHeight;
+
+            fetch('/ask_gemini', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: message})
+            })
+            .then(res => res.json())
+            .then(data => {
+                const loadEl = document.getElementById(loadingId);
+                if (loadEl) loadEl.remove();
+                container.innerHTML += `<div class="bg-purple-900/20 border border-purple-500/20 p-3 rounded-xl text-gray-200 mt-2 whitespace-pre-wrap"><span class="text-purple-400 font-bold block mb-1">🤖 GEMINI RESPONSE:</span>` + data.response + `</div>`;
+                container.scrollTop = container.scrollHeight;
+            })
+            .catch(err => {
+                const loadEl = document.getElementById(loadingId);
+                if (loadEl) loadEl.remove();
+                container.innerHTML += `<div class="bg-rose-950/40 border border-rose-900 p-3 rounded-xl text-rose-400 mt-2">Error connecting backend engine services API.</div>`;
+            });
+        }
+
+        function calculateInlineMargin() {
+            const completed = parseFloat(document.getElementById('task_completed').value) || 0;
+            const payout = parseFloat(document.getElementById('task_payout').value) || 0;
+            const workerCost = parseFloat(document.getElementById('task_worker').value) || 0;
+            const feePercent = parseFloat(document.getElementById('task_fee').value) || 0;
+
+            const revenue = completed * payout;
+            const expenses = (completed * workerCost) + (revenue * (feePercent / 100.0));
+            const net = revenue - expenses;
+
+            const profitDisplay = document.getElementById('inline_profit_display');
+            const statusText = document.getElementById('inline_status');
+
+            if (document.getElementById('task_completed').value === "" && document.getElementById('task_sent').value === "") {
+                profitDisplay.innerText = "$0.00"; profitDisplay.className = "text-2xl font-black text-gray-500";
+                statusText.innerText = "Fill fields to calculate yield position"; return;
+            }
+            profitDisplay.innerText = (net >= 0 ? '+' : '') + '$' + net.toFixed(2);
+            if (net > 0) {
+                profitDisplay.className = "text-2xl font-black text-emerald-400"; statusText.innerHTML = "💰 Position status: <span class='text-emerald-500 font-bold'>PROFIT RUNNING</span>";
+            } else if (net < 0) {
+                profitDisplay.className = "text-2xl font-black text-rose-500"; statusText.innerHTML = "⚠️ Position status: <span class='text-rose-500 font-bold'>LOSS DIRECTIONAL</span>";
+            } else {
+                profitDisplay.className = "text-2xl font-black text-sky-400"; statusText.innerHTML = "⚖️ Position status: <span class='text-sky-400 font-bold'>FLAT EVEN BREAKEAVEN</span>";
+            }
+        }
+
+        function runSimulation() {
+            const vol = parseFloat(document.getElementById('sim_volume').value) || 0;
+            const pay = parseFloat(document.getElementById('sim_payout').value) || 0;
+            const work = parseFloat(document.getElementById('sim_worker').value) || 0;
+            const feePct = parseFloat(document.getElementById('sim_fee').value) || 0;
+            const revenue = vol * pay;
+            const net = revenue - (vol * work) - (revenue * (feePct / 100.0));
+            const target = document.getElementById('sim_result');
+            target.innerText = (net >= 0 ? '+' : '') + '$' + net.toFixed(2);
+            target.className = net >= 0 ? "text-3xl font-black text-emerald-400" : "text-3xl font-black text-rose-500";
+        }
+
+        // 🛡️ The fixed visual config loop array block parameters
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {% if chart_labels %}{{ chart_labels | tojson }}{% else %}['No Data']{% endif %},
+                datasets: [{
+                    data: {% if chart_values %}{{ chart_values | tojson }}{% else %}[0]{% endif %},
+                    borderColor: '#0284c7', backgroundColor: 'rgba(2, 132, 199, 0.1)',
+                    borderWidth: 3, fill: true, tension: 0.35, pointBackgroundColor: '#38bdf8'
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af' } }, x: { grid: { color: '#1f2937' }, ticks: { color: '#9ca3af' } } }
+            }
+        });
+
+        window.onload = function() { calculateInlineMargin(); };
+    </script>
+</body>
+</html>

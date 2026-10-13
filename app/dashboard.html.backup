@@ -1,0 +1,121 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DigiFlow</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="dot"></span>DIGIFLOW</div>
+    <div class="brand-sub">AUTOMATION CONTROL</div>
+    <nav>
+      <button class="nav active">â—ˆ Dashboard</button>
+      <button class="nav">â–£ Products</button>
+      <button class="nav">âœ¦ Content</button>
+      <button class="nav">â–¤ Images</button>
+      <button class="nav">â†— Pinterest</button>
+      <button class="nav">âœ“ Review Center</button>
+      <button class="nav">â—« Analytics</button>
+    </nav>
+    <div class="system">
+      <div class="eyebrow">LOCAL SYSTEM</div>
+      <div><span class="status-dot"></span> Ollama ready later</div>
+      <div><span class="status-dot"></span> FFmpeg ready</div>
+      <div><span class="status-dot"></span> Browser ready</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">DIGISTORE24 â†’ PINTEREST</div>
+        <h1>Automation Command Center</h1>
+      </div>
+      <div class="pill"><span class="status-dot"></span> SYSTEM ONLINE</div>
+    </header>
+
+    <section class="stats">
+      <div class="stat"><span>PRODUCTS</span><strong>0</strong><small>60 target</small></div>
+      <div class="stat"><span>VERIFIED</span><strong>0</strong><small>waiting</small></div>
+      <div class="stat"><span>IMAGES</span><strong>0</strong><small>Adobe stage</small></div>
+      <div class="stat"><span>REVIEW</span><strong>0</strong><small>human approval</small></div>
+    </section>
+
+    <section class="grid">
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="eyebrow">CONNECTED WORKSPACE</div><h2>Browser Services</h2></div>
+          <button class="ghost" onclick="refreshStatus()">Refresh</button>
+        </div>
+        <div class="services">
+          <article class="service">
+            <div class="icon">D24</div>
+            <div><h3>Digistore24</h3><p>Marketplace & product research</p></div>
+            <button onclick="openSite('digistore')">OPEN / LOGIN</button>
+          </article>
+          <article class="service">
+            <div class="icon">AE</div>
+            <div><h3>Adobe Express</h3><p>2:3 template & image workflow</p></div>
+            <button onclick="openSite('adobe')">OPEN / LOGIN</button>
+          </article>
+          <article class="service">
+            <div class="icon">P</div>
+            <div><h3>Pinterest</h3><p>Pin preparation & final review</p></div>
+            <button onclick="openSite('pinterest')">OPEN / LOGIN</button>
+          </article>
+        </div>
+        <div id="message" class="message">Persistent DigiFlow Browser Workspace • Sessions are stored locally.</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><div class="eyebrow">TASK ENGINE</div><h2>Pipeline</h2></div></div>
+        <div class="pipeline">
+          <div><b>01</b><span>Find 60 unique products</span><em>QUEUED</em></div>
+          <div><b>02</b><span>Verify URL / amount / details</span><em>QUEUED</em></div>
+          <div><b>03</b><span>Generate local AI content</span><em>QUEUED</em></div>
+          <div><b>04</b><span>Adobe Express images</span><em>QUEUED</em></div>
+          <div><b>05</b><span>Prepare Pinterest</span><em>QUEUED</em></div>
+          <div><b>06</b><span>Human review & publish</span><em>MANUAL</em></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="categories">
+      <button class="cat active">BUSINESS & INVESTMENT <span>10</span></button>
+      <button class="cat">DATING / RELATIONSHIPS <span>10</span></button>
+      <button class="cat">EDUCATION <span>10</span></button>
+      <button class="cat">HEALTH & FITNESS <span>10</span></button>
+      <button class="cat">FAMILY & CHILDREN <span>10</span></button>
+      <button class="cat">HOBBY & CRAFT <span>10</span></button>
+      <button class="cat">ALL CATEGORIES <span>60</span></button>
+    </section>
+
+    <div class="bottom-bar">
+      <button class="bottom active">âš¡ Running Tasks <span>0</span></button>
+      <button class="bottom">âœ“ Completed Tasks <span>0</span></button>
+      <button class="bottom" onclick="openSite('pinterest')">â†— Go to Pinterest</button>
+      <button class="bottom">â—ˆ Review Center <span>0</span></button>
+    </div>
+  </main>
+</div>
+<script>
+async function openSite(site){
+  const r = await fetch('/api/open/' + site, {method:'POST'});
+  const data = await r.json();
+  const msg = document.getElementById('message');
+  msg.textContent = data.ok ? site.toUpperCase() + ' opened in the persistent browser. Login manually the first time.' : data.error;
+}
+async function refreshStatus(){
+  const r = await fetch('/api/status');
+  const data = await r.json();
+  document.getElementById('message').textContent = data.browser
+    ? 'Persistent browser is running. Site tabs can be reused.'
+    : 'Browser is not running yet.';
+}
+</script>
+</body>
+</html>
+

@@ -1,0 +1,64 @@
+﻿from pathlib import Path
+
+from fastapi import FastAPI
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from .browser import browser_manager
+
+
+BASE = Path(__file__).resolve().parents[1]
+
+app = FastAPI(title="DigiFlow")
+
+
+@app.get("/", response_class=HTMLResponse)
+def dashboard():
+    return HTMLResponse(
+        (BASE / "app" / "dashboard.html").read_text(
+            encoding="utf-8"
+        )
+    )
+
+
+@app.get("/api/status")
+def status():
+    return JSONResponse(browser_manager.status())
+
+
+@app.post("/api/open/{site}")
+def open_site(site: str):
+    try:
+        result = browser_manager.open_site(site)
+
+        return JSONResponse({
+            "ok": True,
+            "site": site,
+            "message": f"{site} browser workspace opened."
+        })
+
+    except Exception as exc:
+        return JSONResponse(
+            {
+                "ok": False,
+                "site": site,
+                "error": str(exc),
+            },
+            status_code=500,
+        )
+
+
+@app.post("/api/close")
+def close_browser():
+    browser_manager.close()
+    return {"ok": True}
+
+
+app.mount(
+    "/static",
+    StaticFiles(directory=BASE / "app" / "static"),
+    name="static",
+)

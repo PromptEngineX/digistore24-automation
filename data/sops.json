@@ -1,0 +1,207 @@
+{
+  "updated_at": "2026-10-06T11:12:20+00:00",
+  "sops": {
+    "digistore24": {
+      "name": "SOP — Digistore24",
+      "version": 1,
+      "purpose": "Select valid, unique Digistore24 products and capture the required product and promotion details for review.",
+      "steps": [
+        "Open the Digistore24 marketplace in the dedicated browser workspace.",
+        "Select the required marketplace category.",
+        "Inspect a product before adding it to DigiFlow.",
+        "Capture the product name, product URL, amount/price, currency when shown, and other essential details available on the product view.",
+        "Open the promotion/promo-link flow when a promotion link is required and capture the actual destination/promo URL.",
+        "Skip the product when the required URL, amount/price, or another essential field is missing.",
+        "Check the permanent product registry before accepting the product.",
+        "Send the accepted product to Review Center; do not treat collection as approval."
+      ],
+      "rules": [
+        "Never intentionally add a duplicate product.",
+        "A product without a usable URL must be skipped.",
+        "A product without a usable amount/price must be skipped.",
+        "Do not invent missing product information.",
+        "Keep the original product URL and promotion URL distinct when both exist.",
+        "Final approval happens in Review Center."
+      ],
+      "checks": [
+        "Category is valid.",
+        "Product name is present.",
+        "Product URL is present and copied accurately.",
+        "Amount/price is present.",
+        "Required details are present.",
+        "Product is not already in the permanent registry.",
+        "Promotion link is captured when required."
+      ],
+      "do_not_do": [
+        "Do not fabricate price, commission, product claims, or promo links.",
+        "Do not overwrite an approved product with a new version.",
+        "Do not reuse an earlier product merely to fill the quota."
+      ]
+    },
+    "adobe_express": {
+      "name": "SOP — Adobe Express",
+      "version": 1,
+      "purpose": "Create a Pinterest-ready visual in Adobe Express Premium using an appropriate template/layout and export the finished image.",
+      "steps": [
+        "Open Adobe Express in the dedicated browser workspace.",
+        "Find a suitable Pinterest design/template with the required vertical format.",
+        "Open the selected template/design.",
+        "Customize the design with the approved product-specific content and visual assets.",
+        "Keep the design readable, professional, and consistent with the product.",
+        "Review the finished design before export.",
+        "Download/export the final image.",
+        "Store the exported asset against the correct product in DigiFlow."
+      ],
+      "rules": [
+        "Use the approved product information only.",
+        "Do not add unsupported claims, fabricated testimonials, or misleading guarantees.",
+        "The exported image must be associated with the correct product.",
+        "Do not overwrite an approved asset; create a new version when a revision is needed."
+      ],
+      "checks": [
+        "Correct product is shown.",
+        "Text is readable.",
+        "Pinterest-oriented vertical layout is used.",
+        "No unsupported claim is visible.",
+        "Final export completed successfully.",
+        "Asset is linked to the correct product."
+      ],
+      "do_not_do": [
+        "Do not publish from Adobe Express as a substitute for the Pinterest review step.",
+        "Do not use a misleading visual that does not match the product.",
+        "Do not overwrite an approved asset."
+      ]
+    },
+    "pinterest": {
+      "name": "SOP — Pinterest",
+      "version": 1,
+      "purpose": "Prepare a Pinterest Pin using the approved image, title, description, destination URL, and keywords, while keeping final publishing manual.",
+      "steps": [
+        "Open Pinterest in the dedicated browser workspace.",
+        "Start the Create Pin flow.",
+        "Attach the approved exported image.",
+        "Enter the approved Pin title.",
+        "Enter the approved Pin description.",
+        "Enter the product/promotion destination URL.",
+        "Add the approved keywords where the Pinterest flow provides the relevant field.",
+        "Review the complete Pin before publishing.",
+        "Leave the final Publish action for manual confirmation."
+      ],
+      "rules": [
+        "Use the approved destination URL.",
+        "Use product-specific copy generated/reviewed in DigiFlow.",
+        "Do not fabricate statistics, testimonials, or guarantees.",
+        "Final Publish is always manual unless this rule is explicitly changed later."
+      ],
+      "checks": [
+        "Correct image is attached.",
+        "Title is present and relevant.",
+        "Description is present and relevant.",
+        "Destination URL is present and correct.",
+        "Keywords are appropriate when applicable.",
+        "Pin is ready for manual review.",
+        "Publish has not been triggered automatically."
+      ],
+      "do_not_do": [
+        "Do not publish automatically.",
+        "Do not substitute an unapproved image or URL.",
+        "Do not add unsupported claims to the Pin copy."
+      ]
+    }
+  },
+  "digistore24": {
+    "name": "SOP — Digistore24",
+    "purpose": "Find and review valid Digistore24 products before they enter the DigiFlow pipeline.",
+    "steps": [
+      "Open the Digistore24 marketplace in the persistent browser workspace.",
+      "Navigate to the required marketplace category.",
+      "Review candidate products and open the product detail page.",
+      "Confirm the product has a usable URL, amount, and other essential details.",
+      "Obtain the affiliate/promotion link when required by the workflow.",
+      "Reject incomplete, duplicate, or unusable products.",
+      "Save only approved unique products to the Product Vault."
+    ],
+    "rules": [
+      "Never save a product without a usable URL.",
+      "Never save a product without an amount.",
+      "Never reuse a previously selected product.",
+      "Keep category assignment accurate.",
+      "Do not fabricate missing product information."
+    ],
+    "checks": [
+      "Product name present",
+      "URL present",
+      "Amount present",
+      "Essential details present",
+      "Not already in the permanent product registry"
+    ],
+    "do_not_do": [
+      "Do not bypass login or CAPTCHA.",
+      "Do not store Digistore24 passwords in DigiFlow.",
+      "Do not publish or promote a product before review approval."
+    ]
+  },
+  "adobe_express": {
+    "name": "SOP — Adobe Express",
+    "purpose": "Create a Pinterest-ready visual using the persistent Adobe Express Premium workspace.",
+    "steps": [
+      "Open Adobe Express in the persistent browser workspace.",
+      "Choose a suitable Pinterest 2:3 design/template.",
+      "Customize the design with approved product/content information.",
+      "Check layout, readability, branding, and image quality.",
+      "Export the finished image.",
+      "Save and associate the exported asset with the correct product/task."
+    ],
+    "rules": [
+      "Use approved product/content information only.",
+      "Keep the final design suitable for Pinterest.",
+      "Do not invent product claims or testimonials.",
+      "Preserve the association between product, content, and asset."
+    ],
+    "checks": [
+      "Correct product",
+      "Correct Pinterest aspect ratio",
+      "Readable text",
+      "No unsupported claims",
+      "Export completed"
+    ],
+    "do_not_do": [
+      "Do not store Adobe passwords in DigiFlow.",
+      "Do not overwrite approved assets without creating a new version.",
+      "Do not publish to Pinterest from the Adobe step."
+    ]
+  },
+  "pinterest": {
+    "name": "SOP — Pinterest",
+    "purpose": "Prepare a Pinterest Pin from an approved product, copy, and image, stopping before final publication.",
+    "steps": [
+      "Open Pinterest in the persistent browser workspace.",
+      "Start Create Pin.",
+      "Attach the approved image.",
+      "Enter the approved title and description.",
+      "Enter the destination/product URL.",
+      "Add relevant keywords where appropriate.",
+      "Validate all required fields.",
+      "Stop before Publish so the user can perform the final publication manually."
+    ],
+    "rules": [
+      "Use only approved product URLs.",
+      "Use approved generated copy.",
+      "Keep descriptions product-specific and non-misleading.",
+      "Final Publish remains a manual user action."
+    ],
+    "checks": [
+      "Image attached",
+      "Title present",
+      "Description present",
+      "Destination URL present",
+      "Required fields valid",
+      "Publish not automatically clicked"
+    ],
+    "do_not_do": [
+      "Do not store Pinterest passwords in DigiFlow.",
+      "Do not click final Publish automatically.",
+      "Do not use fabricated statistics, testimonials, or guarantees."
+    ]
+  }
+}

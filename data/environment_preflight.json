@@ -1,0 +1,115 @@
+{
+  "ready": true,
+  "results": [
+    {
+      "name": "Playwright",
+      "status": "PASS",
+      "detail": "installed"
+    },
+    {
+      "name": "Requests",
+      "status": "PASS",
+      "detail": "2.34.2"
+    },
+    {
+      "name": "BeautifulSoup",
+      "status": "PASS",
+      "detail": "4.15.0"
+    },
+    {
+      "name": "lxml",
+      "status": "PASS",
+      "detail": "6.1.3"
+    },
+    {
+      "name": "Pydantic",
+      "status": "PASS",
+      "detail": "2.13.5"
+    },
+    {
+      "name": "python-dotenv",
+      "status": "PASS",
+      "detail": "installed"
+    },
+    {
+      "name": "Pytest",
+      "status": "PASS",
+      "detail": "9.1.1"
+    },
+    {
+      "name": "pytest-playwright",
+      "status": "PASS",
+      "detail": "installed"
+    },
+    {
+      "name": "Pillow",
+      "status": "PASS",
+      "detail": "12.3.0"
+    },
+    {
+      "name": "RapidFuzz",
+      "status": "PASS",
+      "detail": "3.14.6"
+    },
+    {
+      "name": "Tenacity",
+      "status": "PASS",
+      "detail": "installed"
+    },
+    {
+      "name": "HTTPX",
+      "status": "PASS",
+      "detail": "0.28.1"
+    },
+    {
+      "name": "Rich",
+      "status": "PASS",
+      "detail": "installed"
+    },
+    {
+      "name": "FFmpeg",
+      "status": "PASS",
+      "detail": "ffmpeg version 9.0.2-essentials_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    {
+      "name": "Google Chrome",
+      "status": "PASS",
+      "detail": "Opening in existing browser session."
+    },
+    {
+      "name": "Chrome CDP :9222",
+      "status": "PASS",
+      "detail": "Chrome/154.0.8037.98"
+    },
+    {
+      "name": "Ollama",
+      "status": "PASS",
+      "detail": "2 model(s)"
+    },
+    {
+      "name": "Ollama model llama3.1:8b",
+      "status": "PASS",
+      "detail": "installed"
+    },
+    {
+      "name": "Ollama model qwen3:8b",
+      "status": "PASS",
+      "detail": "installed"
+    },
+    {
+      "name": "DigiFlow SQLite",
+      "status": "PASS",
+      "detail": "E:\\digiflow_starter\\data\\digiflow.sqlite3"
+    },
+    {
+      "name": "DigiFlow API :8787",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "Dependency lock file",
+      "status": "PASS",
+      "detail": "E:\\digiflow_starter\\requirements.lock.txt"
+    }
+  ]
+}
